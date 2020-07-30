@@ -4,6 +4,7 @@ import sys
 import os
 import datetime
 import logging
+import urllib
 import urllib.request
 
 selfpath = os.path.dirname(os.path.realpath(__file__))
@@ -88,8 +89,9 @@ papers = [
 
 def main():
     paper_index = get_last_paper() + 1
-    if (paper_index > len(papers)):
+    if (paper_index > len(papers)-1):
         paper_index = 0
+
     delay = 900
     try:
 
@@ -151,6 +153,17 @@ def main():
         logging.info("ctrl + c:")
         epd7in5bc.epdconfig.module_exit()
         exit()
+
+def internet_on():
+    try:
+        urllib.request.urlretrieve('https://google.com')
+        return True
+    except:
+        return False
+
+while (internet_on() == False):
+    logging.info("No network connection. Waiting 5 seconds.")
+    time.sleep(5)
 
 while True:
     main()
