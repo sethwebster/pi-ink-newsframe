@@ -46,7 +46,7 @@ def render_image_to_ink(source_file):
 
 def send_image_to_device(rendered_file, epd):
     logging.info("Preparing to send to device.")
-    epd.Clear()
+    # epd.Clear()
     time.sleep(1)
     logging.info("Ready to send.")
     time.sleep(5)
@@ -67,12 +67,12 @@ def get_last_paper():
     try:
         filename = os.path.join(selfpath, 'last-paper.dat')
         if (os.path.exists(filename) == False):
-            return 0
+            return -1
         file = open("last-paper.dat", "r")
         dat = file.readlines()
         return int(dat[0])
     except:
-        return 0
+        return -1
 
 
 papers = [
@@ -95,7 +95,7 @@ def main():
     delay = 900
     try:
 
-        logging.info("New York Times e-Frame")
+        logging.info("NewsFrame v0.1a")
         logging.info("Opening module...")
         epd = epd7in5b_V3.EPD()
         logging.info("Initializing module...")
@@ -104,55 +104,25 @@ def main():
             paper = papers[paper_index]
             set_last_paper(str(paper_index))
             logging.info("Will render %s", paper)
-            x = datetime.datetime.now()
-            year = str(x.year)
-            month = str(x.month).zfill(2)
-            day = str(x.day).zfill(2)
-
+            
             front_page = download_front_page(paper)
             rendered_file = front_page.replace(".pdf", ".bmp")
-            new_render = False
-            # if (os.path.exists(download_output_file) == False):
-            #     logging.info("Downloading %s to %s", link, download_output_file)
-            #     urllib.request.urlretrieve(link, download_output_file)
-            # else:
-            #     logging.info("Today's front page already downloaded.")
 
             if (os.path.exists(rendered_file) == False):
                 rendered_file = render_image_to_ink(front_page)
-                new_render = True
                 logging.info("New Front Page Rendered.")
             else:
                 logging.info("{} front page already rendered.".format(paper))
 
-            tries = 0
-            sent = False
-            while sent == False and tries < 3:
-                tries = tries + 1
-                try:
-                    send_image_to_device(rendered_file, epd)
-                    sent = True
-                except IOError as e:
-                    logging.info(e)
-
-            # logging.info("Sleeping display.")
-            # epd.sleep()
-            # logging.info("Sleeping.")
-
+            send_image_to_device(rendered_file, epd)
 
             logging.info("Waiting %d seconds...", delay)
             time.sleep(delay)
+            set_last_paper(str(paper_index))
             paper_index = paper_index + 1
 
     except IOError as e:
         logging.info(e)
-
-    except KeyboardInterrupt:
-        logging.info("Sleeping Display")
-        epd.sleep()
-        logging.info("ctrl + c:")
-        epd7in5bc.epdconfig.module_exit()
-        exit()
 
 def internet_on():
     try:
@@ -165,6 +135,20 @@ while (internet_on() == False):
     logging.info("No network connection. Waiting 5 seconds.")
     time.sleep(5)
 
-while True:
-    main()
-    epd7in5bc.epdconfig.module_exit()
+run = True
+while run:
+    try:
+        main()
+
+    except KeyboardInterrupt:
+        logging.info("Sleeping Display")
+        logging.info("ctrl + c:")
+        epd7in5b_V3.epdconfig.module_exit()
+        run = False
+        exit()
+    except:        
+        e = sys.exc_info()[0]
+        logging.error("An error occured")
+        logging.error(e)
+
+epd7in5bc.epdconfig.module_exit()
