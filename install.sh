@@ -1,5 +1,5 @@
 echo "Updating system..."
-sudo apt-get update && sudo apt-get upgrade
+sudo apt-get update && sudo apt-get upgrade -y
 echo "Enabling spi..."
 sudo sed -i 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
 echo "Installing ImageMagick"
