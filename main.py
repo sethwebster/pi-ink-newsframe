@@ -7,7 +7,6 @@ import logging
 import urllib
 import urllib.request
 
-
 def local_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
 
@@ -22,6 +21,7 @@ from waveshare_epd import epd7in5b_V3
 import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
+from network import network
 
 logging.basicConfig(level=logging.INFO)
 link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
@@ -165,7 +165,7 @@ def main():
         logging.info(e)
 
 
-wait_for_network()
+network.wait_for_network()
 
 run = True
 while run:
