@@ -87,6 +87,18 @@ def get_last_paper():
     except:
         return -1
 
+def internet_on():
+    try:
+        urllib.request.urlretrieve('https://google.com')
+        return True
+    except:
+        return False
+
+def wait_for_network():
+    while (internet_on() == False):
+        logging.info("No network connection. Waiting 5 seconds.")
+        time.sleep(5)
+
 
 papers = [
     "NY_NYT",
@@ -152,16 +164,8 @@ def main():
     except IOError as e:
         logging.info(e)
 
-def internet_on():
-    try:
-        urllib.request.urlretrieve('https://google.com')
-        return True
-    except:
-        return False
 
-while (internet_on() == False):
-    logging.info("No network connection. Waiting 5 seconds.")
-    time.sleep(5)
+wait_for_network()
 
 run = True
 while run:
