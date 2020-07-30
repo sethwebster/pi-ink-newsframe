@@ -7,9 +7,13 @@ import logging
 import urllib
 import urllib.request
 
-selfpath = os.path.dirname(os.path.realpath(__file__))
-picdir = os.path.dirname(os.path.realpath(__file__))
-libdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
+
+def local_path(path):
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+
+selfpath = local_path("")
+picdir = selfpath
+libdir = local_path("lib")
 
 if os.path.exists(libdir):
     sys.path.append(libdir)
@@ -22,14 +26,20 @@ import traceback
 logging.basicConfig(level=logging.INFO)
 link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
 
-def download_front_page(paper):
-    x = datetime.datetime.now()
-    # year = str(x.year)
-    # month = str(x.month).zfill(2)
-    day = str(x.day).zfill(2)
-    download_output_file = os.path.join(selfpath, '{}-{}.pdf'.format(paper, day))
 
-    if (os.path.exists(download_output_file) == False):
+def get_day():
+    x = datetime.datetime.now()
+    return str(x.day).zfill(2)
+
+
+def download_front_page(paper, force = False):
+    day = get_day()
+    download_output_file = local_path('{}-{}.pdf'.format(paper, day))
+    
+    if (force and os.path.exists(download_output_file)):
+        os.remove(download_output_file)
+
+    if (force or os.path.exists(download_output_file) == False):
         link = link_template.format(day, paper)
         os.system("wget {}".format(link))
         os.rename("{}.pdf".format(paper), download_output_file)
@@ -40,9 +50,12 @@ def download_front_page(paper):
 def render_image_to_ink(source_file):
     logging.info("Rendering to e-Ink.")
     dest_file = source_file.replace(".pdf", ".bmp")
-    os.system("convert {} -resize 528x880\! -rotate -90 -background white -alpha remove {}".format(source_file, dest_file))
-    logging.info("Rendered: %s", dest_file)
-    return dest_file
+    exit_code = os.system("convert {} -resize 528x880\! -rotate -90 -background white -alpha remove {}".format(source_file, dest_file))
+    if (exit_code == 0):
+        logging.info("Rendered: %s", dest_file)
+        return dest_file
+    else:
+        return False
 
 def send_image_to_device(rendered_file, epd):
     logging.info("Preparing to send to device.")
@@ -58,17 +71,17 @@ def send_image_to_device(rendered_file, epd):
     logging.info("Sent to device.")
 
 def set_last_paper(index):
-    filename = os.path.join(selfpath, 'last-paper.dat')
-    file = open("last-paper.dat","w")
+    filename = local_path('last-paper.dat')
+    file = open(filename, "w")
     file.write(index)
     file.close()
 
 def get_last_paper():
     try:
-        filename = os.path.join(selfpath, 'last-paper.dat')
+        filename = local_path('last-paper.dat')
         if (os.path.exists(filename) == False):
             return -1
-        file = open("last-paper.dat", "r")
+        file = open(filename, "r")
         dat = file.readlines()
         return int(dat[0])
     except:
@@ -91,7 +104,7 @@ def main():
     paper_index = get_last_paper() + 1
     if (paper_index > len(papers)-1):
         paper_index = 0
-
+    day = get_day()
     delay = 900
     try:
 
@@ -101,20 +114,35 @@ def main():
         logging.info("Initializing module...")
         epd.init()
         while True:
+            if (get_day() != day):
+                # day has changed, clean up
+                os.system("rm -f *.bmp")
+                os.system("rm -f *.pdf")
+                day = get_day()
+
             paper = papers[paper_index]
             set_last_paper(str(paper_index))
-            logging.info("Will render %s", paper)
+            logging.info("Current paper: %s", paper)
             
             front_page = download_front_page(paper)
             rendered_file = front_page.replace(".pdf", ".bmp")
 
             if (os.path.exists(rendered_file) == False):
                 rendered_file = render_image_to_ink(front_page)
-                logging.info("New Front Page Rendered.")
+                if (rendered_file):
+                    logging.info("New Front Page Rendered.")
+                else: 
+                    # File failed to render, re-try to download since it was probably corrupted
+                    logging.info("Failed: New Front Page Render. Trying again.")
+                    front_page = download_front_page(paper, True)
+                    rendered_file = render_image_to_ink(front_page)
             else:
                 logging.info("{} front page already rendered.".format(paper))
 
-            send_image_to_device(rendered_file, epd)
+            if rendered_file:
+                send_image_to_device(rendered_file, epd)
+            else:
+                logging.info("Terminal failure: Can't seem to render %s", paper)
 
             logging.info("Waiting %d seconds...", delay)
             time.sleep(delay)
