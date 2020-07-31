@@ -1,4 +1,4 @@
 *.bmp
 *.pdf
 last-paper.dat
-.vscode/*
+.vscode
