@@ -8,6 +8,7 @@ echo "Enabling PDF rendering"
 sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/g' /etc/ImageMagick-6/policy.xml
 echo "Installing spidev..."
 pip3 install spidev
+
 echo "Reboot required..."
 echo "Wait 5 seconds for reboot, or ctrl-c to cancel"
 sleep 5
