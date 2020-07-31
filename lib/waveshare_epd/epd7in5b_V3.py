@@ -163,16 +163,12 @@ class EPD:
         self.send_data(0xAf);
 
         self.send_command(0x24)
-        if imageblack:         
-            logging.debug("Sending imageblack")
-            for i in range(0, int(self.width * self.height / 8)):
-                self.send_data(imageblack[i]);
-        
+        for i in range(0, int(self.width * self.height / 8)):
+            self.send_data(imageblack[i]);
+    
         self.send_command(0x26)
-        if imagered:
-            logging.debug("Sending imagered")
-            for i in range(0, int(self.width * self.height / 8)):
-                self.send_data(~imagered[i]);
+        for i in range(0, int(self.width * self.height / 8)):
+            self.send_data(~imagered[i]);
         
         self.send_command(0x22);
         self.send_data(0xC7);    #Load LUT from MCU(0x32)
