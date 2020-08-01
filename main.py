@@ -199,6 +199,9 @@ def check_for_command():
             print("Restarting")
             os.system("sudo bash update.sh")
             return False
+        if (command == "NEXT"):
+            print("Skipping")            
+            return False
     return True
 
 def main():
