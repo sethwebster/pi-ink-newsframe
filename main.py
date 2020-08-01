@@ -30,25 +30,26 @@ link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
 
 font24 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 24)
 font18 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 18)
+font16 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 16)
 
 papers = [
-    "NY_NYT",
+    # "NY_NYT",
     "CARTOON",
-    "WSJ",
+    # "WSJ",
     "CARTOON",
-    "NY_NYP",
+    # "NY_NYP",
     "CARTOON",
-    "IL_CT",
+    # "IL_CT",
     "CARTOON",
-    "DC_WP",
+    # "DC_WP",
     "CARTOON",
-    "CA_LAT",
+    # "CA_LAT",
     "CARTOON",
-    "TX_HC",
+    # "TX_HC",
     "CARTOON",
-    "CA_SFC",
+    # "CA_SFC",
     "CARTOON",
-    "AZ_ADS"
+    # "AZ_ADS"
 ]
 
 def get_day():
@@ -86,15 +87,20 @@ def convert_image_to_bmp(source_file, fill = True):
     else:
         return False
 
-def center_text(img, font, text, top):
-    draw = ImageDraw.Draw(img)
+def center_text(draw, font, text, top):
     text_width, text_height = draw.textsize(text, font)
     position = ((epd7in5b_V3.EPD_HEIGHT-text_width)/2,top)
     draw.text(position, text,font=font, fill=0)
-    return img
+    # return img
 
 def fixup_text(text):
-    return text.replace("&rdquo;", "\"").replace("&ldquo;","\"").replace("&mdash;","-")
+    return text.replace("&rdquo;", "\"").replace("&ldquo;","\"").replace("&mdash;","--")
+
+def draw_text(img, text, content_height):
+    print("Rendering %s", text)
+    draw = ImageDraw.Draw(img)
+    center_text(draw, font16, text, content_height)
+    return img
 
 def send_image_to_device(rendered_file, content_height, text, epd):
     logging.info("Preparing to send to device.")
@@ -105,8 +111,7 @@ def send_image_to_device(rendered_file, content_height, text, epd):
     HRYimage = Image.new('1', (epd7in5b_V3.EPD_HEIGHT, epd7in5b_V3.EPD_WIDTH), 255)
     HBlackimage = Image.open(rendered_file)
     if (text):
-        print("Rendering %s", text)
-        HBlackimage = center_text(HBlackimage, font18, fixup_text(text), content_height)
+        HBlackimage = draw_text(HBlackimage, fixup_text(text), content_height)
     logging.info("Image opened.")
     logging.info("Sending to device.")
     epd.display(epd.getbuffer(HBlackimage), epd.getbuffer(HRYimage))
@@ -129,18 +134,6 @@ def get_last_paper():
         return int(dat[0])
     except:
         return -1
-
-def internet_on():
-    try:
-        urllib.request.urlretrieve('https://google.com')
-        return True
-    except:
-        return False
-
-def wait_for_network():
-    while (internet_on() == False):
-        logging.info("No network connection. Waiting 5 seconds.")
-        time.sleep(5)
 
 def render_cartoon(epd):
     with urllib.request.urlopen('https://www.newyorker.com/cartoons/random/randomAPI') as response:
@@ -230,10 +223,10 @@ while run:
         epd7in5b_V3.epdconfig.module_exit()
         run = False
         exit()
-    except:        
-        e = sys.exc_info()[0]
-        logging.error("An error occured")
-        logging.error(e)
+    # except:        
+    #     e = sys.exc_info()[0]
+    #     logging.error("An error occured")
+    #     logging.error(e)
 
 epd7in5bc.epdconfig.module_exit()
 

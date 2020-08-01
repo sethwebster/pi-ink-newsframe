@@ -5,3 +5,4 @@
 last-paper.dat
 .vscode
 **/__pycache__/*
+wget-log
