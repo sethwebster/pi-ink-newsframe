@@ -1,4 +1,7 @@
 *.bmp
 *.pdf
+*.jpg
+*.png
 last-paper.dat
 .vscode
+**/__pycache__/*
