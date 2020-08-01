@@ -7,6 +7,7 @@ import logging
 import urllib
 import urllib.request
 import json
+from flask import Flask
 
 def local_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
@@ -194,6 +195,10 @@ def check_for_command():
             print("Rebooting")
             os.system("sudo reboot")
             return False
+        if (command == "RESTART"):
+            print("Restarting")
+            os.system("sudo bash update.sh")
+            return False
     return True
 
 def main():
@@ -235,6 +240,7 @@ def main():
 
 
 network.wait_for_network()
+
 
 run = True
 while run:
