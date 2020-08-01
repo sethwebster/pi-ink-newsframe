@@ -33,23 +33,23 @@ font18 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 18)
 font16 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 16)
 
 papers = [
-    # "NY_NYT",
+    "NY_NYT",
     "CARTOON",
-    # "WSJ",
+    "WSJ",
     "CARTOON",
-    # "NY_NYP",
+    "NY_NYP",
     "CARTOON",
-    # "IL_CT",
+    "IL_CT",
     "CARTOON",
-    # "DC_WP",
+    "DC_WP",
     "CARTOON",
-    # "CA_LAT",
+    "CA_LAT",
     "CARTOON",
-    # "TX_HC",
+    "TX_HC",
     "CARTOON",
-    # "CA_SFC",
+    "CA_SFC",
     "CARTOON",
-    # "AZ_ADS"
+    "AZ_ADS"
 ]
 
 def get_day():
