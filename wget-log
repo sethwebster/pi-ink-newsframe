@@ -1,11 +1,0 @@
---2020-07-31 16:19:14--  https://cdn.newseum.org/dfp/pdf31/NY_NYP.pdf
-Resolving cdn.newseum.org (cdn.newseum.org)... 104.18.36.11, 172.67.220.211, 104.18.37.11, ...
-Connecting to cdn.newseum.org (cdn.newseum.org)|104.18.36.11|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 1662937 (1.6M) [application/pdf]
-Saving to: ‘NY_NYP.pdf’
-
-NY_NYP.pdf            0%[                    ]       0  --.-KB/s               NY_NYP.pdf           14%[=>                  ] 230.23K  1.09MB/s               NY_NYP.pdf           35%[======>             ] 574.23K  1.38MB/s               NY_NYP.pdf           52%[=========>          ] 854.23K  1.36MB/s               NY_NYP.pdf           76%[==============>     ]   1.21M  1.46MB/s               NY_NYP.pdf          100%[===================>]   1.58M  1.62MB/s    in 1.0s    
-
-2020-07-31 16:19:15 (1.62 MB/s) - ‘NY_NYP.pdf’ saved [1662937/1662937]
-
