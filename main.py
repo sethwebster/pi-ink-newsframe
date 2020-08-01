@@ -177,6 +177,24 @@ def render_next(index, epd):
     else:
         render_paper(paper, epd)
 
+def check_for_command():
+    filename = local_path("COMMAND")
+    print("Checking for command: {}", filename)
+    if os.path.exists(filename):
+        file = open(filename, "r")
+        dat = file.readlines()
+        command = dat[0].strip()
+        os.remove(filename)
+        print ("Command Received: ", command)
+        if (command == "STOP"):
+            print("Terminating")
+            exit(0)
+            return False
+        if (command == "REBOOT"):
+            print("Rebooting")
+            os.system("sudo reboot")
+            return False
+    return True
 
 def main():
     paper_index = get_last_paper() + 1
@@ -201,9 +219,15 @@ def main():
 
             render_next(paper_index, epd)
             set_last_paper(str(paper_index))
-
             logging.info("Waiting %d seconds...", delay)
-            time.sleep(delay)
+            interval = 5
+            wait_time = 0
+            keep_going = True
+            while (keep_going and wait_time < delay):
+                keep_going = check_for_command()
+                time.sleep(interval)
+                wait_time = wait_time + interval
+
             paper_index = paper_index + 1
 
     except IOError as e:
@@ -223,6 +247,8 @@ while run:
         epd7in5b_V3.epdconfig.module_exit()
         run = False
         exit()
+    except SystemExit:
+        exit(0)
     except:        
         e = sys.exc_info()[0]
         logging.error("An error occured")
