@@ -223,10 +223,10 @@ while run:
         epd7in5b_V3.epdconfig.module_exit()
         run = False
         exit()
-    # except:        
-    #     e = sys.exc_info()[0]
-    #     logging.error("An error occured")
-    #     logging.error(e)
+    except:        
+        e = sys.exc_info()[0]
+        logging.error("An error occured")
+        logging.error(e)
 
 epd7in5bc.epdconfig.module_exit()
 
