@@ -9,6 +9,19 @@ sudo sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy do
 echo "Installing spidev..."
 pip3 install spidev
 
+if grep -q main.py /etc/rc.local; then
+  echo "NewsFrame startup script already added."
+else
+  echo "python3 /home/pi/pi-ink-newsframe/main.py &"
+fi
+
+if grep -q server.py /etc/rc.local; then
+  echo "NewsFrame HTTP API Server script already added."
+else
+  echo "python3 /home/pi/pi-ink-newsframe/server.py &"
+fi
+
+
 echo "Reboot required..."
 echo "Wait 5 seconds for reboot, or ctrl-c to cancel"
 sleep 5
