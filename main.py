@@ -25,6 +25,7 @@ import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
 from network import network
+from convert import convert
 
 logging.basicConfig(level=logging.INFO)
 link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
@@ -63,7 +64,7 @@ def download_file(url, force = False):
 def download_front_page(paper, force = False):
     day = get_day()
     download_output_file = local_path('{}-{}.pdf'.format(paper, day))
-    
+
     if (force and os.path.exists(download_output_file)):
         os.remove(download_output_file)
 
@@ -78,10 +79,7 @@ def download_front_page(paper, force = False):
 def convert_image_to_bmp(source_file, fill = True):
     logging.info("Rendering to e-Ink.")
     dest_file = source_file.replace(".pdf", ".bmp").replace(".jpg", ".bmp")
-    if (fill):
-        exit_code = os.system("convert {} -resize 528x880\! -background white -gravity center -alpha remove {}".format(source_file, dest_file))
-    else:
-        exit_code = os.system("convert {} -resize 528x880 -extent 528x880 -background white -gravity center -alpha remove {}".format(source_file, dest_file))
+    exit_code = convert.resize(source_file, dest_file, fill)
     if (exit_code == 0):
         logging.info("Rendered: %s", dest_file)
         return dest_file
@@ -138,7 +136,7 @@ def get_last_paper():
 
 def render_cartoon(epd):
     with urllib.request.urlopen('https://www.newyorker.com/cartoons/random/randomAPI') as response:
-        json_str = response.read()      
+        json_str = response.read()
         data = json.loads(json_str)
         src = data[0]['src']
         text = data[0]['caption']
@@ -148,7 +146,7 @@ def render_cartoon(epd):
         width, height = image.size
 
         rendered_file = convert_image_to_bmp(filename, False)
-        
+
         send_image_to_device(rendered_file, height + 40, text, epd)
 
 def render_paper(paper, epd):
@@ -158,19 +156,19 @@ def render_paper(paper, epd):
     if (os.path.exists(rendered_file) == False):
         rendered_file = convert_image_to_bmp(front_page, paper != "CARTOON")
         if (rendered_file):
-            logging.info("New Front Page Rendered.")            
-        else: 
+            logging.info("New Front Page Rendered.")
+        else:
             # File failed to render, re-try to download since it was probably corrupted
             logging.info("Failed: New Front Page Render. Trying again.")
             front_page = download_front_page(paper, True)
             rendered_file = convert_image_to_bmp(front_page)
-        
+
     if (rendered_file):
         send_image_to_device(rendered_file, epd7in5b_V3.EPD_WIDTH, False, epd)
     else:
         logging.info("Terminal failure: Can't seem to render %s", paper)
 
-def render_next(index, epd): 
+def render_next(index, epd):
     paper = papers[index]
     if (paper == "CARTOON"):
         render_cartoon(epd)
@@ -200,7 +198,7 @@ def check_for_command():
             os.system("sudo bash update.sh")
             return False
         if (command == "NEXT"):
-            print("Skipping")            
+            print("Skipping")
             return False
     return True
 
@@ -258,10 +256,9 @@ while run:
         exit()
     except SystemExit:
         exit(0)
-    except:        
-        e = sys.exc_info()[0]
-        logging.error("An error occured")
-        logging.error(e)
+    # except:
+    #     e = sys.exc_info()[0]
+    #     logging.error("An error occured")
+    #     logging.error(e)
 
 epd7in5bc.epdconfig.module_exit()
-

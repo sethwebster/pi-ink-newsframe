@@ -1,8 +1,9 @@
 import logging
 import time
+import urllib
 
 class network():
-    
+
     @property
     def is_network_connected(self):
         try:
