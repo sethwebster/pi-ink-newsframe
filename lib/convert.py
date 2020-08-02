@@ -7,4 +7,4 @@ class convert():
     if (fill):
       return os.system('convert {} -resize 528x880\! -background white -gravity center -alpha remove {}'.format(source_file, dest_file))
     else:
-      os.system("convert {} -resize 528x880 -extent 528x880 -background white -gravity center -alpha remove {}".format(source_file, dest_file))
+      return os.system("convert {} -resize 528x880 -extent 528x880 -background white -gravity center -alpha remove {}".format(source_file, dest_file))
