@@ -21,8 +21,16 @@ else
   echo "python3 /home/pi/pi-ink-newsframe/server.py &"
 fi
 
-
 echo "Reboot required..."
 echo "Wait 5 seconds for reboot, or ctrl-c to cancel"
-sleep 5
+sleep 1
+echo "Wait 4 seconds for reboot, or ctrl-c to cancel"
+sleep 1
+echo "Wait 3 seconds for reboot, or ctrl-c to cancel"
+sleep 1
+echo "Wait 2 seconds for reboot, or ctrl-c to cancel"
+sleep 1
+echo "Wait 1 seconds for reboot, or ctrl-c to cancel"
+sleep 1
+echo "Rebooting."
 sudo shutdown -r now
