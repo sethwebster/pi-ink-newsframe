@@ -1,12 +1,20 @@
 import os
+import sys
 from flask import Flask
 from flask import request
-
-app = Flask(__name__)
-
+from flask import jsonify
 
 def local_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+
+libdir = local_path("lib")
+
+if os.path.exists(libdir):
+    sys.path.append(libdir)
+
+from state import state
+
+app = Flask(__name__)
 
 def write_command(command, arguments):
     filename = local_path('COMMAND')
@@ -17,7 +25,8 @@ def write_command(command, arguments):
 
 @app.route('/status')
 def status():
-    return 'OK'
+    s = state.load(local_path('state.dat'))
+    return jsonify({"state": s.state})
 
 @app.route('/command', methods=['POST'])
 def command():
