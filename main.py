@@ -71,7 +71,7 @@ def convert_image_to_bmp(source_file, fill = True):
 def center_text(draw, font, text, top):
     text_width, text_height = draw.textsize(text, font)
     position = ((epd7in5b_V3.EPD_HEIGHT-text_width)/2,top)
-    draw.text(position, text,font=font, fill=0)
+    draw.text(position, text, font=font, fill=0)
     # return img
 
 def fixup_text(text):
@@ -80,7 +80,23 @@ def fixup_text(text):
 def draw_text(img, text, content_height):
     print("Rendering %s", text)
     draw = ImageDraw.Draw(img)
-    center_text(draw, font16, text, content_height)
+    max_line_len = 80
+    lines = []
+    parts = text.split(' ')
+    curr_line = ""
+    for p in parts:
+        if len(curr_line) + len(p) < max_line_len:
+            curr_line = curr_line + " " + p
+        else:
+            lines.append(curr_line)
+            curr_line = ""
+    if len(curr_line) > 0:
+        lines.append(curr_line)
+
+    top = content_height
+    for l in lines:
+        center_text(draw, font18, l, top)
+        top = top + 30
     return img
 
 def send_image_to_device(rendered_file, content_height, text, epd):
@@ -134,6 +150,9 @@ def render_paper(paper, epd):
 
 def render_next(app_state, epd):
     if (len(app_state.papers) > 0):
+        if (app_state.current_index + 1 > len(app_state.papers)):
+            app_state.current_index = 0
+            app_state.save()
         paper = app_state.papers[app_state.current_index]
         if (paper == "CARTOON"):
             render_cartoon(epd)
@@ -182,6 +201,13 @@ def check_for_command():
             return False
     return True
 
+def cleanup(start_day, current_day): 
+    if (start_day != current_day):
+        os.system("rm -f *.jpg")
+        os.system("rm -f *.bmp")
+        os.system("rm -f *.pdf")
+    return current_day
+
 def main():
     app_state = state.load(local_path("state.dat"))
     app_state.current_index = app_state.current_index + 1
@@ -190,20 +216,13 @@ def main():
     day = get_day()
     delay = 900
     try:
-
         logging.info("NewsFrame v0.1a")
         logging.info("Opening module...")
         epd = epd7in5b_V3.EPD()
         logging.info("Initializing module...")
         epd.init()
         while True:
-            if (get_day() != day):
-                # day has changed, clean up
-                os.system("rm -f *.jpg")
-                os.system("rm -f *.bmp")
-                os.system("rm -f *.pdf")
-                day = get_day()
-
+            day = cleanup(day, get_day())
             keep_going = True
             interval = 5
             while (keep_going and time.time() < app_state.next_render):
