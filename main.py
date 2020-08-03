@@ -200,7 +200,7 @@ def main():
                 day = get_day()
 
             render_next(app_state, epd)
-            app_state.save()
+            app_state.save(local_path("state.dat"))
             logging.info("Waiting %d seconds...", delay)
 
             interval = 5
