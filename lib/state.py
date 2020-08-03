@@ -11,16 +11,23 @@ def stateDecoder(dict):
 class state():
     DEFAULT_PATH = local_path("state.dat")
     def __init__(self):
-        self._papers = []
-        self._current_index = -1
+        self.state = {"papers":[], "current_index":-1}
 
     @property
     def current_index(self):
-        return self._current_index
+        return self.state["current_index"]
 
     @current_index.setter
     def current_index(self, value):
-        self._current_index = value
+        self.state["current_index"] = value
+
+    @property
+    def papers(self):
+        return self.state["papers"]
+
+    @papers.setter
+    def papers(self, value):
+        self.state["papers"] = value
 
     def save(self, path = DEFAULT_PATH):
         logging.debug("Saving state.")
@@ -37,4 +44,6 @@ class state():
             return state()
         file = open(path, "r")
         data = file.read()
-        return json.loads(data, object_hook=stateDecoder)
+        s = state()
+        s.state = json.loads(data)["state"]
+        return s
