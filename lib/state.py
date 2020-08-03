@@ -24,6 +24,7 @@ class state():
 
     @staticmethod
     def load(path = DEFAULT_PATH):
+        logging.info("Loading state from ", path)
         if (os.path.exists(path) == False):
             return state()
         file = open(path, "r")
