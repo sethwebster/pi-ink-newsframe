@@ -26,6 +26,8 @@ from PIL import Image,ImageDraw,ImageFont
 import traceback
 from network import network
 from convert import convert
+from restart import Restart
+from state import state
 
 logging.basicConfig(level=logging.INFO)
 link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
@@ -33,26 +35,6 @@ link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
 font24 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 24)
 font18 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 18)
 font16 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 16)
-
-papers = [
-    "NY_NYT",
-    "CARTOON",
-    "WSJ",
-    "CARTOON",
-    "NY_NYP",
-    "CARTOON",
-    "IL_CT",
-    "CARTOON",
-    "DC_WP",
-    "CARTOON",
-    "CA_LAT",
-    "CARTOON",
-    "TX_HC",
-    "CARTOON",
-    "CA_SFC",
-    "CARTOON",
-    "AZ_ADS"
-]
 
 def get_day():
     x = datetime.datetime.now()
@@ -116,24 +98,6 @@ def send_image_to_device(rendered_file, content_height, text, epd):
     epd.display(epd.getbuffer(HBlackimage), epd.getbuffer(HRYimage))
     logging.info("Sent to device.")
 
-def set_last_paper(index):
-    logging.info("Saving last paper.")
-    filename = local_path('last-paper.dat')
-    file = open(filename, "w")
-    file.write(index)
-    file.close()
-
-def get_last_paper():
-    try:
-        filename = local_path('last-paper.dat')
-        if (os.path.exists(filename) == False):
-            return -1
-        file = open(filename, "r")
-        dat = file.readlines()
-        return int(dat[0])
-    except:
-        return -1
-
 def render_cartoon(epd):
     with urllib.request.urlopen('https://www.newyorker.com/cartoons/random/randomAPI') as response:
         json_str = response.read()
@@ -168,8 +132,8 @@ def render_paper(paper, epd):
     else:
         logging.info("Terminal failure: Can't seem to render %s", paper)
 
-def render_next(index, epd):
-    paper = papers[index]
+def render_next(app_state, epd):
+    paper = app_state.papers[app_state.current_index]
     if (paper == "CARTOON"):
         render_cartoon(epd)
 
@@ -184,28 +148,37 @@ def check_for_command():
         dat = file.readlines()
         command = dat[0].strip()
         os.remove(filename)
+        
         print ("Command Received: ", command)
+
         if (command == "STOP"):
             print("Terminating")
             exit(0)
             return False
+
         if (command == "REBOOT"):
             print("Rebooting")
             os.system("sudo reboot")
             return False
-        if (command == "RESTART"):
-            print("Restarting")
-            os.system("sudo bash update.sh")
+
+        if (command == "SHUTDOWN"):
+            print("Shutting Down.")
+            os.system("sudo shutdown now")
             return False
+
+        if (command == "RESTART"):
+            raise Restart()
+
         if (command == "NEXT"):
             print("Skipping")
             return False
     return True
 
 def main():
-    paper_index = get_last_paper() + 1
-    if (paper_index > len(papers)-1):
-        paper_index = 0
+    app_state = state.load()
+    app_state.current_index = app_state.current_index + 1
+    if (app_state.current_index > len(app_state.papers)-1):
+        app_state.current_index = 0
     day = get_day()
     delay = 900
     try:
@@ -223,9 +196,10 @@ def main():
                 os.system("rm -f *.pdf")
                 day = get_day()
 
-            render_next(paper_index, epd)
-            set_last_paper(str(paper_index))
+            render_next(app_state, epd)
+            app_state.save()
             logging.info("Waiting %d seconds...", delay)
+
             interval = 5
             wait_time = 0
             keep_going = True
@@ -233,8 +207,8 @@ def main():
                 keep_going = check_for_command()
                 time.sleep(interval)
                 wait_time = wait_time + interval
-
-            paper_index = paper_index + 1
+    
+            app_state.current_index = app_state.current_index + 1
 
     except IOError as e:
         logging.info(e)
@@ -256,9 +230,11 @@ while run:
         exit()
     except SystemExit:
         exit(0)
-    # except:
-    #     e = sys.exc_info()[0]
-    #     logging.error("An error occured")
-    #     logging.error(e)
+    except Restart:
+        logging.info("Restarting...")
+    except:
+        e = sys.exc_info()[0]
+        logging.error("An error occured")
+        logging.error(e)
 
 epd7in5bc.epdconfig.module_exit()
