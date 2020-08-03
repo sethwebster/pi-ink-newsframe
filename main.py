@@ -178,7 +178,7 @@ def check_for_command():
     return True
 
 def main():
-    app_state = state.load()
+    app_state = state.load(local_path("state.dat"))
     app_state.current_index = app_state.current_index + 1
     if (app_state.current_index > len(app_state.papers)-1):
         app_state.current_index = 0
