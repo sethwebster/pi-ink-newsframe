@@ -4,6 +4,7 @@ import json
 import logging
 from collections import namedtuple
 from json import JSONEncoder
+import time
 
 def stateDecoder(dict):
     return namedtuple('state', dict.keys())(*dict.values())
@@ -11,7 +12,7 @@ def stateDecoder(dict):
 class state():
     DEFAULT_PATH = local_path("state.dat")
     def __init__(self):
-        self.state = {"papers":[], "current_index":-1}
+        self.state = {"papers":[], "current_index":-1, "next_render": time.time() }
 
     @property
     def current_index(self):
@@ -28,6 +29,14 @@ class state():
     @papers.setter
     def papers(self, value):
         self.state["papers"] = value
+
+    @property
+    def next_render(self):
+        return self.state["next_render"]
+
+    @next_render.setter
+    def next_render(self, value):
+        self.state["next_render"] = value
 
     def save(self, path = DEFAULT_PATH):
         logging.debug("Saving state.")
