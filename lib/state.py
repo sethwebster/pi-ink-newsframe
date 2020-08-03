@@ -11,8 +11,16 @@ def stateDecoder(dict):
 class state():
     DEFAULT_PATH = local_path("state.dat")
     def __init__(self):
-        self.papers = []
-        self.current_index = -1
+        self._papers = []
+        self._current_index = -1
+
+    @property
+    def current_index(self):
+        return self._current_index
+
+    @current_index.setter
+    def current_index(self, value):
+        self._current_index = value
 
     def save(self, path = DEFAULT_PATH):
         logging.debug("Saving state.")
