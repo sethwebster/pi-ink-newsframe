@@ -204,17 +204,16 @@ def main():
                 os.system("rm -f *.pdf")
                 day = get_day()
 
-            render_next(app_state, epd)
-            app_state.save(local_path("state.dat"))
-            logging.info("Waiting %d seconds...", delay)
-
-            interval = 5
-            wait_time = 0
             keep_going = True
-            while (keep_going and wait_time < delay):
+            interval = 5
+            while (keep_going and time.time() < app_state.next_render):
                 keep_going = check_for_command()
                 time.sleep(interval)
-                wait_time = wait_time + interval
+
+            render_next(app_state, epd)
+            app_state.next_render = time.time() + delay
+            app_state.save(local_path("state.dat"))
+            logging.info("Waiting %d seconds...", delay)
     
             app_state.current_index = app_state.current_index + 1
 
