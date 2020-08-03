@@ -169,6 +169,11 @@ def check_for_command():
             os.system("sudo shutdown now")
             return False
 
+        if (command == "UPDATE"):
+            print("Updating")
+            os.system("bash update.sh")
+            return False
+
         if (command == "RESTART"):
             raise Restart()
 
