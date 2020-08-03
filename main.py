@@ -133,12 +133,15 @@ def render_paper(paper, epd):
         logging.info("Terminal failure: Can't seem to render %s", paper)
 
 def render_next(app_state, epd):
-    paper = app_state.papers[app_state.current_index]
-    if (paper == "CARTOON"):
-        render_cartoon(epd)
+    if (len(app_state.papers) > 0):
+        paper = app_state.papers[app_state.current_index]
+        if (paper == "CARTOON"):
+            render_cartoon(epd)
 
+        else:
+            render_paper(paper, epd)
     else:
-        render_paper(paper, epd)
+        logging.info("No papers in configuration")
 
 def check_for_command():
     filename = local_path("COMMAND")
