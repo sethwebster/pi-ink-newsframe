@@ -9,6 +9,18 @@ import time
 def stateDecoder(dict):
     return namedtuple('state', dict.keys())(*dict.values())
 
+def safeKey(key, default, dict):
+    found_key = False
+    for k in dict.keys():
+        if (key == k):
+            found_key = k
+            break
+    
+    if (found_key):
+        return dict[found_key]
+    else:
+        return default
+
 class state():
     DEFAULT_PATH = local_path("state.dat")
     def __init__(self):
@@ -32,7 +44,7 @@ class state():
 
     @property
     def next_render(self):
-        return self.state["next_render"]
+        return safeKey('next_render', time.time(), self.state)
 
     @next_render.setter
     def next_render(self, value):
