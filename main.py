@@ -40,23 +40,12 @@ def get_day():
     x = datetime.datetime.now()
     return str(x.day) #.zfill(2)
 
-def download_file(url, force = False):
-    None
-
 def download_front_page(paper, force = False):
     day = get_day()
-    download_output_file = local_path('{}-{}.pdf'.format(paper, day))
-
-    if (force and os.path.exists(download_output_file)):
-        os.remove(download_output_file)
-
-    if (force or os.path.exists(download_output_file) == False):
-        link = link_template.format(day, paper)
-        os.system("wget {}".format(link))
-        os.rename("{}.pdf".format(paper), download_output_file)
-        time.sleep(1)
-
-    return download_output_file
+    download_output_file = local_path('{}-{}.pdf'.format(paper, day))   
+    link = link_template.format(day, paper)
+    
+    return network.download_file(link, download_output_file, force)
 
 def convert_image_to_bmp(source_file, fill = True):
     logging.info("Rendering to e-Ink.")
