@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import sys
+sys.path.append("./lib")
 import os
 import datetime
 import logging
@@ -8,15 +9,7 @@ import urllib
 import urllib.request
 import json
 from flask import Flask
-
-selfpath = local_path("")
-picdir = selfpath
-fontdir = local_path("fonts")
-libdir = local_path("lib")
-
-if os.path.exists(libdir):
-    sys.path.append(libdir)
-
+from utilities import local_path, split_text_to_lines, get_day
 from waveshare_epd import epd7in5b_V3
 import time
 from PIL import Image,ImageDraw,ImageFont
@@ -25,7 +18,10 @@ from network import network
 from convert import convert
 from restart import Restart
 from state import state
-from utilities import local_path, split_text_to_lines, get_day
+
+selfpath = local_path("")
+picdir = selfpath
+fontdir = local_path("fonts")
 
 logging.basicConfig(level=logging.INFO)
 link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'

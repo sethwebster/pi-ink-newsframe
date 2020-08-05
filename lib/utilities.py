@@ -2,7 +2,7 @@ import os
 import datetime
 
 def local_path(path):
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), path)
 
 
 def split_text_to_lines(text, max_line_len = 65):
