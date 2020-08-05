@@ -66,11 +66,7 @@ def center_text(draw, font, text, top):
 def fixup_text(text):
     return text.replace("&rdquo;", "\"").replace("&ldquo;","\"").replace("&mdash;","--")
 
-def draw_text(img, text, content_height):
-    print("Rendering %s", text)
-    draw = ImageDraw.Draw(img)
-    max_line_len = 65
-    lines = []
+def split_text_to_lines(text, max_line_len = 65):
     parts = text.split(' ')
     curr_line = ""
     for p in parts:
@@ -79,10 +75,20 @@ def draw_text(img, text, content_height):
         else:
             lines.append(curr_line)
             curr_line = ""
+
     if len(curr_line) > 0:
         lines.append(curr_line)
 
+    return lines
+
+def draw_text(img, text, content_height):
+    print("Rendering %s", text)
+    draw = ImageDraw.Draw(img)
+    max_line_len = 65
+    lines = []
     top = content_height
+    lines = split_text_to_lines(text, max_line_len)
+    print(lines)
     for l in lines:
         center_text(draw, font18, l, top)
         top = top + 30
