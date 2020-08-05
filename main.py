@@ -8,7 +8,6 @@ import urllib
 import urllib.request
 import json
 from flask import Flask
-from utilities import local_path, split_text_to_lines, get_day
 
 selfpath = local_path("")
 picdir = selfpath
@@ -26,6 +25,7 @@ from network import network
 from convert import convert
 from restart import Restart
 from state import state
+from utilities import local_path, split_text_to_lines, get_day
 
 logging.basicConfig(level=logging.INFO)
 link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
