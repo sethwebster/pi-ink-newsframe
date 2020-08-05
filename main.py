@@ -69,7 +69,7 @@ def fixup_text(text):
 def draw_text(img, text, content_height):
     print("Rendering %s", text)
     draw = ImageDraw.Draw(img)
-    max_line_len = 80
+    max_line_len = 65
     lines = []
     parts = text.split(' ')
     curr_line = ""
@@ -108,9 +108,8 @@ def render_cartoon(epd):
         json_str = response.read()
         data = json.loads(json_str)
         src = data[0]['src']
+        filename = network.download_file(src, os.path.basename(src))
         text = data[0]['caption']
-        os.system('wget {}'.format(src))
-        filename = os.path.basename(src)
         image = Image.open(filename)
         width, height = image.size
 

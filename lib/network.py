@@ -28,7 +28,7 @@ class network():
             else:
                 return destination
 
-        exit_code = os.system("wget {}".format(link))
+        exit_code = os.system("wget {}".format(url))
         
         if exit_code == 0:
             downloaded_file = os.path.basename(url)
