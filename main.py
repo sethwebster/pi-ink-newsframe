@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import sys
-sys.path.append("./lib")
 import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "./lib"))
 import datetime
 import logging
 import urllib
