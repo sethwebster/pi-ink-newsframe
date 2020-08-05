@@ -8,9 +8,7 @@ import urllib
 import urllib.request
 import json
 from flask import Flask
-
-def local_path(path):
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+from utilities import local_path, split_text_to_lines, get_day
 
 selfpath = local_path("")
 picdir = selfpath
@@ -35,10 +33,6 @@ link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
 font24 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 24)
 font18 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 18)
 font16 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 16)
-
-def get_day():
-    x = datetime.datetime.now()
-    return str(x.day) #.zfill(2)
 
 def download_front_page(paper, force = False):
     day = get_day()
@@ -65,21 +59,6 @@ def center_text(draw, font, text, top):
 
 def fixup_text(text):
     return text.replace("&rdquo;", "\"").replace("&ldquo;","\"").replace("&mdash;","--")
-
-def split_text_to_lines(text, max_line_len = 65):
-    parts = text.split(' ')
-    curr_line = ""
-    for p in parts:
-        if len(curr_line) + len(p) < max_line_len:
-            curr_line = curr_line + " " + p
-        else:
-            lines.append(curr_line)
-            curr_line = ""
-
-    if len(curr_line) > 0:
-        lines.append(curr_line)
-
-    return lines
 
 def draw_text(img, text, content_height):
     print("Rendering %s", text)
