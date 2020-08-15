@@ -26,6 +26,7 @@ fontdir = local_path("fonts")
 logging.basicConfig(level=logging.INFO)
 link_template = 'https://cdn.newseum.org/dfp/pdf{}/{}.pdf'
 
+font36 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 36)
 font24 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 24)
 font18 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 18)
 font16 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 16)
@@ -58,15 +59,20 @@ def fixup_text(text):
 
 def draw_text(img, text, content_height, display_height, display_width):
     print("Rendering %s", text)
+    img = img.rotate(90, Image.NEAREST, expand = 1)
     draw = ImageDraw.Draw(img)
     max_line_len = 65
     lines = []
     top = content_height
+    print("HT", content_height)
+    # TODO: Know the original image dimensions so we can properly place the text
     lines = split_text_to_lines(text, max_line_len)
     print(lines)
     for l in lines:
-        center_text(draw, font18, l, top, display_height, display_width)
+        center_text(draw, font36, l, top, display_height, display_width)
         top = top + 30
+    img = img.rotate(270, Image.NEAREST, expand = 1)
+
     return img
 
 def send_image_to_device(rendered_file, content_height, text, epd):
@@ -93,10 +99,13 @@ def render_cartoon(epd):
         text = data[0]['caption']
         image = Image.open(filename)
         width, height = image.size
+        
+        diff = epd.height / height
+        print("Diff", diff)
 
         rendered_file = convert_image_to_bmp(filename, epd.height, epd.width, False)
 
-        send_image_to_device(rendered_file, height + 40, text, epd)
+        send_image_to_device(rendered_file, round((height * diff)) + 40, text, epd)
 
 def render_paper(paper, epd):
     logging.info("Current paper: %s", paper)
@@ -222,7 +231,7 @@ while run:
     except KeyboardInterrupt:
         logging.info("Sleeping Display")
         logging.info("ctrl + c:")
-        driver_it8951.epdconfig.module_exit()
+        # driver_it8951.epdconfig.module_exit()
         run = False
         exit()
     except SystemExit:
