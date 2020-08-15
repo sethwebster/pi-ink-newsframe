@@ -87,7 +87,10 @@ def send_image_to_device(rendered_file, content_height, text, epd):
         HBlackimage = draw_text(HBlackimage, fixup_text(text), content_height, epd.height, epd.width)
     logging.info("Image opened.")
     logging.info("Sending to device.")
-    epd.draw(0, 0, HBlackimage, epd.DISPLAY_UPDATE_MODE_GC16)
+
+    left = round((epd.width / 2) - (HBlackimage.width / 2))
+
+    epd.draw(left, 0, HBlackimage, epd.DISPLAY_UPDATE_MODE_GC16)
     logging.info("Sent to device.")
 
 def render_cartoon(epd):
@@ -199,7 +202,7 @@ def main():
         logging.info("Opening module...")
         epd = driver_it8951.IT8951()
         logging.info("Initializing module...")
-        res = epd.init()
+        res = epd.init(False)
         
         while True:
             day = cleanup(day, get_day())
