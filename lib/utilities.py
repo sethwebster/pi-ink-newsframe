@@ -7,17 +7,20 @@ def local_path(path):
 
 def split_text_to_lines(text, max_line_len = 65):
     parts = text.split(' ')
-    curr_line = ""
+    curr_line = []
     lines = []
+    print(parts)
     for p in parts:
-        if len(curr_line) + len(p) < max_line_len:
-            curr_line = curr_line + " " + p
+        print("Lines", lines)
+        if len(" ".join(curr_line)) + len(p) < max_line_len:
+            curr_line.append(p)
         else:
-            lines.append(curr_line)
-            curr_line = ""
+            curr_line.append(p)
+            lines.append(" ".join(curr_line))
+            curr_line = []
 
     if len(curr_line) > 0:
-        lines.append(curr_line)
+        lines.append(" ".join(curr_line))
 
     return lines
 
