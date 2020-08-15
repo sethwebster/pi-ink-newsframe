@@ -3,8 +3,14 @@ import os
 class convert():
 
   @classmethod
-  def resize(self, source_file, dest_file, fill=False):
+  def resize(self, source_file, dest_file, display_height, display_width, fill=False):
     if (fill):
-      return os.system('convert {} -resize 528x880\! -background white -gravity center -alpha remove {}'.format(source_file, dest_file))
+      command = 'convert {} -resize {}x{}^ -extent {}x{}  -background white -gravity center -alpha remove -rotate 90 {} '.format(
+        source_file, display_height, display_width, display_height, display_width, dest_file
+      )
+      return os.system(command)
     else:
-      return os.system("convert {} -resize 528x880 -extent 528x880 -background white -gravity center -alpha remove {}".format(source_file, dest_file))
+      command = "convert {} -resize {}x{} -extent {}x{} -background white -gravity center -alpha remove -rotate 90 {} ".format(
+        source_file, display_height, display_width, display_height, display_width, dest_file
+      )
+      return os.system(command)

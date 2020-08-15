@@ -10,7 +10,7 @@ import urllib.request
 import json
 from flask import Flask
 from utilities import local_path, split_text_to_lines, get_day
-from waveshare_epd import epd7in5b_V3
+from drivers import driver_it8951
 import time
 from PIL import Image,ImageDraw,ImageFont
 import traceback
@@ -37,26 +37,26 @@ def download_front_page(paper, force = False):
     
     return network.download_file(link, download_output_file, force)
 
-def convert_image_to_bmp(source_file, fill = True):
+def convert_image_to_bmp(source_file, display_height, display_width, fill = True):
     logging.info("Rendering to e-Ink.")
     dest_file = source_file.replace(".pdf", ".bmp").replace(".jpg", ".bmp")
-    exit_code = convert.resize(source_file, dest_file, fill)
+    exit_code = convert.resize(source_file, dest_file, display_height, display_width, fill)
     if (exit_code == 0):
         logging.info("Rendered: %s", dest_file)
         return dest_file
     else:
         return False
 
-def center_text(draw, font, text, top):
+def center_text(draw, font, text, top, display_height, display_width):
     text_width, text_height = draw.textsize(text, font)
-    position = ((epd7in5b_V3.EPD_HEIGHT-text_width)/2,top)
+    position = ((display_height-text_width)/2,top)
     draw.text(position, text, font=font, fill=0)
     # return img
 
 def fixup_text(text):
     return text.replace("&rdquo;", "\"").replace("&ldquo;","\"").replace("&mdash;","--")
 
-def draw_text(img, text, content_height):
+def draw_text(img, text, content_height, display_height, display_width):
     print("Rendering %s", text)
     draw = ImageDraw.Draw(img)
     max_line_len = 65
@@ -65,7 +65,7 @@ def draw_text(img, text, content_height):
     lines = split_text_to_lines(text, max_line_len)
     print(lines)
     for l in lines:
-        center_text(draw, font18, l, top)
+        center_text(draw, font18, l, top, display_height, display_width)
         top = top + 30
     return img
 
@@ -75,13 +75,13 @@ def send_image_to_device(rendered_file, content_height, text, epd):
     time.sleep(1)
     logging.info("Ready to send.")
     time.sleep(5)
-    HRYimage = Image.new('1', (epd7in5b_V3.EPD_HEIGHT, epd7in5b_V3.EPD_WIDTH), 255)
+    # HRYimage = Image.new('1', (epd.height, epd.width), 255)
     HBlackimage = Image.open(rendered_file)
     if (text):
-        HBlackimage = draw_text(HBlackimage, fixup_text(text), content_height)
+        HBlackimage = draw_text(HBlackimage, fixup_text(text), content_height, epd.height, epd.width)
     logging.info("Image opened.")
     logging.info("Sending to device.")
-    epd.display(epd.getbuffer(HBlackimage), epd.getbuffer(HRYimage))
+    epd.draw(0, 0, HBlackimage, epd.DISPLAY_UPDATE_MODE_GC16)
     logging.info("Sent to device.")
 
 def render_cartoon(epd):
@@ -94,7 +94,7 @@ def render_cartoon(epd):
         image = Image.open(filename)
         width, height = image.size
 
-        rendered_file = convert_image_to_bmp(filename, False)
+        rendered_file = convert_image_to_bmp(filename, epd.height, epd.width, False)
 
         send_image_to_device(rendered_file, height + 40, text, epd)
 
@@ -103,17 +103,17 @@ def render_paper(paper, epd):
     front_page = download_front_page(paper)
     rendered_file = front_page.replace(".pdf", ".bmp")
     if (os.path.exists(rendered_file) == False):
-        rendered_file = convert_image_to_bmp(front_page, paper != "CARTOON")
+        rendered_file = convert_image_to_bmp(front_page, epd.height, epd.width, paper != "CARTOON")
         if (rendered_file):
             logging.info("New Front Page Rendered.")
         else:
             # File failed to render, re-try to download since it was probably corrupted
             logging.info("Failed: New Front Page Render. Trying again.")
             front_page = download_front_page(paper, True)
-            rendered_file = convert_image_to_bmp(front_page)
+            rendered_file = convert_image_to_bmp(front_page, epd.height, epd.width, paper != "CARTOON")
 
     if (rendered_file):
-        send_image_to_device(rendered_file, epd7in5b_V3.EPD_WIDTH, False, epd)
+        send_image_to_device(rendered_file, epd.width, False, epd)
     else:
         logging.info("Terminal failure: Can't seem to render %s", paper)
 
@@ -123,11 +123,12 @@ def render_next(app_state, epd):
             app_state.current_index = 0
             app_state.save()
         paper = app_state.papers[app_state.current_index]
+
         if (paper == "CARTOON"):
             render_cartoon(epd)
-
         else:
             render_paper(paper, epd)
+
     else:
         logging.info("No papers in configuration")
 
@@ -187,9 +188,10 @@ def main():
     try:
         logging.info("NewsFrame v0.1a")
         logging.info("Opening module...")
-        epd = epd7in5b_V3.EPD()
+        epd = driver_it8951.IT8951()
         logging.info("Initializing module...")
-        epd.init()
+        res = epd.init()
+        
         while True:
             day = cleanup(day, get_day())
             keep_going = True
@@ -220,16 +222,16 @@ while run:
     except KeyboardInterrupt:
         logging.info("Sleeping Display")
         logging.info("ctrl + c:")
-        epd7in5b_V3.epdconfig.module_exit()
+        driver_it8951.epdconfig.module_exit()
         run = False
         exit()
     except SystemExit:
         exit(0)
     except Restart:
         logging.info("Restarting...")
-    except:
-        e = sys.exc_info()[0]
-        logging.error("An error occured")
-        logging.error(e)
+    # except:
+    #     e = sys.exc_info()[0]
+    #     logging.error("An error occured")
+    #     logging.error(e)
 
-epd7in5bc.epdconfig.module_exit()
+# epd7in5bc.epdconfig.module_exit()
