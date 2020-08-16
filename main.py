@@ -81,16 +81,17 @@ def send_image_to_device(rendered_file, content_height, text, epd):
     time.sleep(1)
     logging.info("Ready to send.")
     time.sleep(5)
-    # HRYimage = Image.new('1', (epd.height, epd.width), 255)
+    HRYimage = Image.new('1', (epd.height, epd.width), 255)
     HBlackimage = Image.open(rendered_file)
     if (text):
         HBlackimage = draw_text(HBlackimage, fixup_text(text), content_height, epd.height, epd.width)
     logging.info("Image opened.")
     logging.info("Sending to device.")
 
-    left = round((epd.width / 2) - (HBlackimage.width / 2))
-
-    epd.draw(left, 0, HBlackimage, epd.DISPLAY_UPDATE_MODE_GC16)
+    left = round((epd.height / 2) - (HBlackimage.height / 2))
+    print("Left at ", left)
+    epd.clear()
+    epd.draw(0, left, HBlackimage, epd.DISPLAY_UPDATE_MODE_GC16)
     logging.info("Sent to device.")
 
 def render_cartoon(epd):
@@ -114,7 +115,7 @@ def render_paper(paper, epd):
     logging.info("Current paper: %s", paper)
     front_page = download_front_page(paper)
     rendered_file = front_page.replace(".pdf", ".bmp")
-    if (os.path.exists(rendered_file) == False):
+    if (1 == 1 or os.path.exists(rendered_file) == False):
         rendered_file = convert_image_to_bmp(front_page, epd.height, epd.width, paper != "CARTOON")
         if (rendered_file):
             logging.info("New Front Page Rendered.")
