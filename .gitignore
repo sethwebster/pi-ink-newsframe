@@ -1,6 +1,7 @@
 *.bmp
 *.pdf
 *.jpg
+*.jpeg
 *.png
 last-paper.dat
 .vscode
