@@ -22,7 +22,7 @@ def safeKey(key, default, dict):
         return default
 
 class state():
-    DEFAULT_PATH = local_path("state.dat")
+    DEFAULT_PATH = local_path("state.json")
     def __init__(self):
         self.state = {"papers":[], "current_index":-1, "next_render": time.time() }
 
@@ -67,4 +67,5 @@ class state():
         data = file.read()
         s = state()
         s.state = json.loads(data)["state"]
+        print(s.state)
         return s

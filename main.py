@@ -192,7 +192,7 @@ def cleanup(start_day, current_day):
     return current_day
 
 def main():
-    app_state = state.load(local_path("state.dat"))
+    app_state = state.load(local_path("state.json"))
     app_state.current_index = app_state.current_index + 1
     if (app_state.current_index > len(app_state.papers)-1):
         app_state.current_index = 0
@@ -215,7 +215,7 @@ def main():
 
             render_next(app_state, epd)
             app_state.next_render = time.time() + delay
-            app_state.save(local_path("state.dat"))
+            app_state.save(local_path("state.json"))
             logging.info("Waiting %d seconds...", delay)
     
             app_state.current_index = app_state.current_index + 1

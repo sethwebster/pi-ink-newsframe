@@ -25,7 +25,7 @@ def write_command(command, arguments):
 
 @app.route('/status')
 def status():
-    s = state.load(local_path('state.dat'))
+    s = state.load(local_path('state.json'))
     return jsonify({"state": s.state})
 
 @app.route('/command', methods=['POST'])
