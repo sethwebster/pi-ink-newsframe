@@ -181,6 +181,7 @@ def check_for_command(app_state):
 
         if (command == "RERENDER"):
             app_state.current_index = app_state.current_index - 1
+            app_state.next_render = 0
             app_state.save()
             raise Restart()
 
