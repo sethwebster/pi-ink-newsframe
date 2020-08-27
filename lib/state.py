@@ -24,7 +24,7 @@ def safeKey(key, default, dict):
 class state():
     DEFAULT_PATH = local_path("state.json")
     def __init__(self):
-        self.state = {"papers":[], "current_index":-1, "next_render": time.time() }
+        self.state = {"papers":[], "current_index":-1, "next_render": time.time(), "interval": 900 }
 
     @property
     def current_index(self):
@@ -49,6 +49,14 @@ class state():
     @next_render.setter
     def next_render(self, value):
         self.state["next_render"] = value
+
+    @property
+    def interval(self):
+        return safeKey("interval", 900, self.state)
+
+    @interval.setter
+    def interval(self, value):
+        self.state["interval"] = value
 
     def save(self, path = DEFAULT_PATH):
         logging.debug("Saving state.")

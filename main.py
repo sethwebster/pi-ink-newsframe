@@ -49,7 +49,7 @@ def convert_image_to_bmp(source_file, display_height, display_width, fill = True
         return False
 
 def center_text(draw, font, text, top, display_height, display_width):
-    text_width, text_height = draw.textsize(text, font)
+    text_width, _text_height = draw.textsize(text, font)
     position = ((display_height-text_width)/2,top)
     draw.text(position, text, font=font, fill=0)
     # return img
@@ -102,7 +102,7 @@ def render_cartoon(epd):
         filename = network.download_file(src, os.path.basename(src))
         text = data[0]['caption']
         image = Image.open(filename)
-        width, height = image.size
+        _width, height = image.size
         
         diff = epd.height / height
         print("Diff", diff)
@@ -190,39 +190,55 @@ def check_for_command(app_state):
             return False
     return True
 
-def cleanup(start_day, current_day): 
+def cleanup_if_necessary(start_day, current_day): 
     if (start_day != current_day):
-        os.system("rm -f *.jpg")
-        os.system("rm -f *.bmp")
-        os.system("rm -f *.pdf")
+        os.system("rm -f *.jpeg *.jpg *.bmp *.pdf")
     return current_day
 
+def save_state(app_state):
+    app_state.save(local_path("state.json"))
+
+def load_state():
+    return state.load(local_path("state.json"))
+
+def init():
+    logging.info("Opening module...")
+    epd = driver_it8951.IT8951()
+    logging.info("Initializing module...")
+    epd.init(False)
+    logging.info("Initialized...")
+    return epd
+
+
 def main():
-    app_state = state.load(local_path("state.json"))
+    app_state = load_state()
+    
     app_state.current_index = app_state.current_index + 1
+    
+    epd = init()
+
     if (app_state.current_index > len(app_state.papers)-1):
         app_state.current_index = 0
+
     day = get_day()
-    delay = 900
+
     try:
         logging.info("NewsFrame v0.1a")
-        logging.info("Opening module...")
-        epd = driver_it8951.IT8951()
-        logging.info("Initializing module...")
-        res = epd.init(False)
         
         while True:
-            day = cleanup(day, get_day())
-            keep_going = True
-            interval = 5
-            while (keep_going and time.time() < app_state.next_render):
-                keep_going = check_for_command(app_state)
-                time.sleep(interval)
+            cleanup_if_necessary(day, get_day())
+            should_continue = True
+            sleep_interval = 5
+            while (should_continue and time.time() < app_state.next_render):
+                should_continue = check_for_command(app_state)
+                time.sleep(sleep_interval)
 
             render_next(app_state, epd)
-            app_state.next_render = time.time() + delay
-            app_state.save(local_path("state.json"))
-            logging.info("Waiting %d seconds...", delay)
+
+            app_state.next_render = time.time() + app_state.interval
+            save_state(app_state)
+
+            logging.info("Waiting %d seconds...", app_state.interval)
     
             app_state.current_index = app_state.current_index + 1
 
