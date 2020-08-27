@@ -3,7 +3,7 @@ import os
 class convert():
   @classmethod
   def resize(self, source_file, dest_file, display_height, display_width, fill=False):
-    command_template =  'convert {source} -resize {height}x{width}  -colorspace gray +dither -colors 16 -gravity center -alpha remove -rotate 90 {destination}'
+    command_template =  'convert {source} -resize {height}x{width}\^ -background white -colorspace gray +dither -colors 16 -gravity center -alpha remove -rotate 90 {destination}'
     if (fill):
       command = command_template.replace(
         "{source}",

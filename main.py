@@ -90,7 +90,7 @@ def send_image_to_device(rendered_file, content_height, text, epd):
 
     left = round((epd.height / 2) - (HBlackimage.height / 2))
     print("Left at ", left)
-    epd.clear()
+    # epd.clear()
     epd.draw(0, left, HBlackimage, epd.DISPLAY_UPDATE_MODE_GC16)
     logging.info("Sent to device.")
 
