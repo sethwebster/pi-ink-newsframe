@@ -145,7 +145,7 @@ def render_next(app_state, epd):
     else:
         logging.info("No papers in configuration")
 
-def check_for_command():
+def check_for_command(app_state):
     filename = local_path("COMMAND")
     print("Checking for command: {}", filename)
     if os.path.exists(filename):
@@ -179,6 +179,11 @@ def check_for_command():
         if (command == "RESTART"):
             raise Restart()
 
+        if (command == "RERENDER"):
+            app_state.current_index = app_state.current_index - 1
+            app_state.save()
+            raise Restart()
+
         if (command == "NEXT"):
             print("Skipping")
             return False
@@ -210,7 +215,7 @@ def main():
             keep_going = True
             interval = 5
             while (keep_going and time.time() < app_state.next_render):
-                keep_going = check_for_command()
+                keep_going = check_for_command(app_state)
                 time.sleep(interval)
 
             render_next(app_state, epd)
