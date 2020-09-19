@@ -182,7 +182,7 @@ def check_for_command(app_state, epd):
 
         if (command == "BATTERY_LOW"):
             render_battery_low(epd)
-            return False
+            shutdown()
 
         if (command == "UPDATE"):
             print("Updating")
