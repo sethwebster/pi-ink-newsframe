@@ -145,7 +145,17 @@ def render_next(app_state, epd):
     else:
         logging.info("No papers in configuration")
 
-def check_for_command(app_state):
+def render_battery_low(epd):
+    filename = local_path("assets/tesla.bmp")
+    send_image_to_device(filename, epd.width, False, epd)
+    # shutdown()
+
+
+def shutdown():
+    print("Shutting Down.")
+    os.system("sudo shutdown now")
+
+def check_for_command(app_state, epd):
     filename = local_path("COMMAND")
     print("Checking for command: {}", filename)
     if os.path.exists(filename):
@@ -167,14 +177,20 @@ def check_for_command(app_state):
             return False
 
         if (command == "SHUTDOWN"):
-            print("Shutting Down.")
-            os.system("sudo shutdown now")
+            shutdown()
+            return False
+
+        if (command == "BATTERY_LOW"):
+            render_battery_low(epd)
             return False
 
         if (command == "UPDATE"):
             print("Updating")
             os.system("bash update.sh")
             return False
+
+        if (command == "RESTART"):
+            raise Restart()
 
         if (command == "RESTART"):
             raise Restart()
@@ -230,7 +246,7 @@ def main():
             should_continue = True
             sleep_interval = 5
             while (should_continue and time.time() < app_state.next_render):
-                should_continue = check_for_command(app_state)
+                should_continue = check_for_command(app_state, epd)
                 time.sleep(sleep_interval)
 
             render_next(app_state, epd)
