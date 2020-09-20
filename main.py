@@ -112,23 +112,26 @@ def render_cartoon(epd):
         send_image_to_device(rendered_file, round((height * diff)) + 40, text, epd)
 
 def render_paper(paper, epd):
-    logging.info("Current paper: %s", paper)
-    front_page = download_front_page(paper)
-    rendered_file = front_page.replace(".pdf", ".bmp")
-    if (1 == 1 or os.path.exists(rendered_file) == False):
-        rendered_file = convert_image_to_bmp(front_page, epd.height, epd.width, paper != "CARTOON")
-        if (rendered_file):
-            logging.info("New Front Page Rendered.")
-        else:
-            # File failed to render, re-try to download since it was probably corrupted
-            logging.info("Failed: New Front Page Render. Trying again.")
-            front_page = download_front_page(paper, True)
+    try: 
+        logging.info("Current paper: %s", paper)
+        front_page = download_front_page(paper)
+        rendered_file = front_page.replace(".pdf", ".bmp")
+        if (1 == 1 or os.path.exists(rendered_file) == False):
             rendered_file = convert_image_to_bmp(front_page, epd.height, epd.width, paper != "CARTOON")
+            if (rendered_file):
+                logging.info("New Front Page Rendered.")
+            else:
+                # File failed to render, re-try to download since it was probably corrupted
+                logging.info("Failed: New Front Page Render. Trying again.")
+                front_page = download_front_page(paper, True)
+                rendered_file = convert_image_to_bmp(front_page, epd.height, epd.width, paper != "CARTOON")
 
-    if (rendered_file):
-        send_image_to_device(rendered_file, epd.width, False, epd)
-    else:
-        logging.info("Terminal failure: Can't seem to render %s", paper)
+        if (rendered_file):
+            send_image_to_device(rendered_file, epd.width, False, epd)
+        else:
+            logging.info("Terminal failure: Can't seem to render %s", paper)
+    except IOError as err: 
+        logging.error("Failed to render paper: {0}".format(err))
 
 def render_next(app_state, epd):
     if (len(app_state.papers) > 0):
