@@ -211,7 +211,7 @@ def check_for_command(app_state, epd):
 
 def cleanup_if_necessary(start_day, current_day): 
     if (start_day != current_day):
-        os.system("rm -f *.jpeg *.jpg *.bmp *.pdf")
+        os.system("rm -f *.jpeg *.jpg *.bmp *.pdf *.png")
     return current_day
 
 def save_state(app_state):
