@@ -9,7 +9,7 @@ import urllib
 import urllib.request
 import json
 from flask import Flask
-from utilities import local_path, split_text_to_lines, get_day
+from utilities import local_path, split_text_to_lines, get_day, get_date_based_folder_name
 from drivers import driver_it8951
 import time
 from PIL import Image,ImageDraw,ImageFont
@@ -20,7 +20,7 @@ from restart import Restart
 from state import state
 
 selfpath = local_path("")
-picdir = selfpath
+picdir = "{}/{}".format(selfpath, 'media')
 fontdir = local_path("fonts")
 
 logging.basicConfig(level=logging.INFO)
@@ -31,9 +31,25 @@ font24 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 24)
 font18 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 18)
 font16 = ImageFont.truetype(os.path.join(fontdir, 'times.ttf'), 16)
 
+def mkdir(path):
+    os.system('mkdir -p {}'.format(path))
+
+def day_path():
+    return "{}/{}".format(picdir,get_date_based_folder_name())
+
+def ensure_day_path():
+    mkdir(
+        day_path()
+    )
+
 def download_front_page(paper, force = False):
     day = get_day()
-    download_output_file = local_path('{}-{}.pdf'.format(paper, day))   
+    dest_folder = "{}/{}".format(picdir,get_date_based_folder_name())
+    
+    ensure_day_path()
+
+    download_output_file = "{}/{}-{}.pdf".format(dest_folder, paper, day)
+    # local_path('{}-{}.pdf'.format(paper, day))   
     link = link_template.format(day, paper)
     
     return network.download_file(link, download_output_file, force)
@@ -99,7 +115,11 @@ def render_cartoon(epd):
         json_str = response.read()
         data = json.loads(json_str)
         src = data[0]['src']
-        filename = network.download_file(src, os.path.basename(src))
+
+        dest_file = "{}/{}".format(day_path(), os.path.basename(src))
+
+        filename = network.download_file(src, dest_file)
+        
         text = data[0]['caption']
         image = Image.open(filename)
         _width, height = image.size

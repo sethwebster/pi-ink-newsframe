@@ -25,6 +25,16 @@ def split_text_to_lines(text, max_line_len=65):
 
     return lines
 
+def get_date_based_folder_name():
+    return "{}/{}/{}".format(get_year(), get_month(), get_day())
+
+def get_year():
+    x = datetime.datetime.now()
+    return str(x.year)
+
+def get_month():
+    x = datetime.datetime.now()
+    return str(x.month)
 
 def get_day():
     x = datetime.datetime.now()
