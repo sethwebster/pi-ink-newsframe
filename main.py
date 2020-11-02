@@ -20,7 +20,7 @@ from restart import Restart
 from state import state
 
 selfpath = local_path("")
-picdir = "{}/{}".format(selfpath, 'media')
+picdir = "{}{}".format(selfpath, 'media')
 fontdir = local_path("fonts")
 
 logging.basicConfig(level=logging.INFO)
