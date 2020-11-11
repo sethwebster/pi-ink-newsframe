@@ -21,7 +21,11 @@ class network():
 
     @staticmethod
     def download_file(url, destination, force = False):
+        path = os.path.dirname(destination)
 
+        if (os.path.exists(path) == False):
+            os.system("mkdir -p {}".format(path))
+            
         if (os.path.exists(destination)):
             if (force):
                 os.remove(destination)
