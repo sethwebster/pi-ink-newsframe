@@ -1,6 +1,6 @@
 import os
 import sys
-from flask import Flask
+from flask import (Flask, render_template)
 from flask import request
 from flask import jsonify
 from flask_cors import CORS
@@ -25,6 +25,12 @@ def write_command(command, arguments):
     file.write(command + "\n")
     file.write(arguments + "\n")
     file.close()
+
+@app.route('/')
+
+def index():
+    return render_template("client/build/index.html")
+
 
 @app.route('/status')
 def status():
