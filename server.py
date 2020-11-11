@@ -3,6 +3,7 @@ import sys
 from flask import Flask
 from flask import request
 from flask import jsonify
+from flask_cors import CORS
 
 def local_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
@@ -15,6 +16,8 @@ if os.path.exists(libdir):
 from state import state
 
 app = Flask(__name__)
+
+CORS(app)
 
 def write_command(command, arguments):
     filename = local_path('COMMAND')
