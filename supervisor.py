@@ -10,7 +10,7 @@ import datetime
 import os
 import sys 
 
-DELTA_MIN=5
+DELTA_MIN=13
 
 # Rely on RTC to keep the time
 subprocess.call(["sudo", "hwclock", "--hctosys"])
