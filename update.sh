@@ -5,5 +5,5 @@ sudo kill $ID
 
 cd /home/pi/pi-ink-newsframe && git pull origin master -f && chown pi.pi -R *
 
-python3 /home/pi/pi-ink-newsframe/main.py & 
-python3 /home/pi/pi-ink-newsframe/server.py & 
+# python3 /home/pi/pi-ink-newsframe/main.py & 
+# python3 /home/pi/pi-ink-newsframe/server.py & 
