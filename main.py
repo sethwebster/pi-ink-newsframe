@@ -249,7 +249,7 @@ def init():
     return epd
 
 
-def main():
+def main(continuous = True):
     app_state = load_state()
     
     app_state.current_index = app_state.current_index + 1
@@ -263,23 +263,28 @@ def main():
 
     try:
         logging.info("NewsFrame v0.1a")
-        
-        while True:
-            cleanup_if_necessary(day, get_day())
-            should_continue = True
-            sleep_interval = 5
-            while (should_continue and time.time() < app_state.next_render):
-                should_continue = check_for_command(app_state, epd)
-                time.sleep(sleep_interval)
-
+        if (continuous == False):
             render_next(app_state, epd)
 
             app_state.next_render = time.time() + app_state.interval
             save_state(app_state)
+        else:
+            while True:
+                cleanup_if_necessary(day, get_day())
+                should_continue = True
+                sleep_interval = 5
+                while (should_continue and time.time() < app_state.next_render):
+                    should_continue = check_for_command(app_state, epd)
+                    time.sleep(sleep_interval)
 
-            logging.info("Waiting %d seconds...", app_state.interval)
-    
-            app_state.current_index = app_state.current_index + 1
+                render_next(app_state, epd)
+
+                app_state.next_render = time.time() + app_state.interval
+                save_state(app_state)
+
+                logging.info("Waiting %d seconds...", app_state.interval)
+        
+                app_state.current_index = app_state.current_index + 1
 
     except IOError as e:
         logging.info(e)
@@ -289,23 +294,26 @@ network.wait_for_network()
 
 
 run = True
-while run:
-    try:
-        main()
+if (len(sys.argv) > 1 and sys.argv[1] == "--once"):
+    main(False)
+else:
+    while run:
+        try:
+            main()
 
-    except KeyboardInterrupt:
-        logging.info("Sleeping Display")
-        logging.info("ctrl + c:")
-        # driver_it8951.epdconfig.module_exit()
-        run = False
-        exit()
-    except SystemExit:
-        exit(0)
-    except Restart:
-        logging.info("Restarting...")
-    # except:
-    #     e = sys.exc_info()[0]
-    #     logging.error("An error occured")
-    #     logging.error(e)
+        except KeyboardInterrupt:
+            logging.info("Sleeping Display")
+            logging.info("ctrl + c:")
+            # driver_it8951.epdconfig.module_exit()
+            run = False
+            exit()
+        except SystemExit:
+            exit(0)
+        except Restart:
+            logging.info("Restarting...")
+        # except:
+        #     e = sys.exc_info()[0]
+        #     logging.error("An error occured")
+        #     logging.error(e)
 
 # epd7in5bc.epdconfig.module_exit()
