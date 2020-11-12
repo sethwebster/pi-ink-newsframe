@@ -7,6 +7,7 @@ const buttons = [
   { text: "Next", command: "NEXT" },
   { text: "Update", command: "UPDATE" },
   { text: "Restart", command: "RESTART" },
+  { text: "Reboot", command: "REBOOT" },
   { text: "Shutdown", command: "SHUTDOWN" },
 ];
 
