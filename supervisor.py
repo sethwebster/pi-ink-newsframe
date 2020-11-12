@@ -35,6 +35,7 @@ print("PiJuiceBatteryLevel: {}".format(pj.status.GetChargeLevel()))
 
 # Do the work
 os.system('python3 /home/pi/pi-ink-newsframe/main.py --once')
+time.sleep(5)
 
 # Set RTC alarm 5 minutes from now
 # RTC is kept in UTC
