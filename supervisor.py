@@ -31,6 +31,8 @@ except:
     print("Cannot create pijuice object")
     sys.exit()
 
+print("PiJuiceBatteryLevel: {}".format(pj.status.GetChargeLevel()))
+
 # Do the work
 os.system('python3 /home/pi/pi-ink-newsframe/main.py --once')
 
