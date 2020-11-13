@@ -14,7 +14,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 DELTA_MIN = 20
-
+MIN_CHARGE_NOTIFY=100
 # Rely on RTC to keep the time
 subprocess.call(["sudo", "hwclock", "--hctosys"])
 
@@ -43,7 +43,7 @@ with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
 
 account_sid = os.getenv('TWILIO_ACCOUNT_SID')
 account_key = os.getenv("TWILIO_ACCOUNT_KEY")
-if (int(percData['data']) < 75):
+if (int(percData['data']) < MIN_CHARGE_NOTIFY):
     os.system('curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/{}/Messages" -u "{}:{}"'.format(
         message, account_sid, account_sid, account_key))
 
