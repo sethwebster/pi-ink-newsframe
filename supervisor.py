@@ -8,19 +8,19 @@ import pijuice
 import subprocess
 import datetime
 import os
-import sys 
+import sys
 import logging
 
 logging.basicConfig(level=logging.INFO)
 
-DELTA_MIN=20
+DELTA_MIN = 20
 
 # Rely on RTC to keep the time
 subprocess.call(["sudo", "hwclock", "--hctosys"])
 
 # Record start time
 txt = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' -- Started\n'
-with open('/home/pi/pi-ink-newsframe/supervisor.log','a') as f:
+with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
     f.write(txt)
 
 # This script is started at reboot by cron.
@@ -38,13 +38,16 @@ percData = pj.status.GetChargeLevel()
 message = "Battery Level is currently {}%\n".format(percData['data'])
 logging.info(message)
 
-with open('/home/pi/pi-ink-newsframe/supervisor.log','a') as f:
+with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
     f.write(message)
 
+account_sid = os.environ("TWILIO_ACCOUNT_SID")
+account_key = os.environ("TWILIO_ACCOUNT_KEY")
 if (int(percData['data']) < 75):
-  os.system('curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/ACc204746fc75f13ca53c6647f607bcd31/Messages" -u "ACc204746fc75f13ca53c6647f607bcd31:8ad73404b41f366f5751b3d11a47e851"'.format(message))
+    os.system('curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/{}/Messages" -u "{}:{}"'.format(
+        message, account_sid, account_sid, account_key))
 
-with open('/home/pi/pi-ink-newsframe/supervisor.log','a') as f:
+with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
     f.write(txt)
 
 
@@ -54,7 +57,7 @@ time.sleep(5)
 
 # Set RTC alarm 5 minutes from now
 # RTC is kept in UTC
-a={}
+a = {}
 a['year'] = 'EVERY_YEAR'
 a['month'] = 'EVERY_MONTH'
 a['day'] = 'EVERY_DAY'
