@@ -1,12 +1,16 @@
 ID=$(ps aux | grep python | grep main.py | awk '{ print $2 }')
 if [ -z "$ID" ]
 then
+  echo "No process main.py running."
+else
   sudo kill $ID
 fi
 
 ID=$(ps aux | grep python | grep server.py | awk '{ print $2 }')
 if [ -z "$ID" ]
 then
+  echo "No process server.py running."
+else
   sudo kill $ID
 fi
 
