@@ -11,6 +11,8 @@ import os
 import sys 
 import logging
 
+logging.basicConfig(level=logging.INFO)
+
 DELTA_MIN=13
 
 # Rely on RTC to keep the time
