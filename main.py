@@ -18,6 +18,7 @@ from network import network
 from convert import convert
 from restart import Restart
 from state import state
+from shutil import copyfile
 
 selfpath = local_path("")
 picdir = "{}{}".format(selfpath, 'media')
@@ -238,6 +239,9 @@ def save_state(app_state):
     app_state.save(local_path("state.json"))
 
 def load_state():
+    if (os.path.exists(local_path("state.json")) == False):
+        copyfile(local_path("default.state.json"), local_path("state.json"))
+        
     return state.load(local_path("state.json"))
 
 def init():
