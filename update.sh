@@ -10,7 +10,7 @@ then
   sudo kill $ID
 fi
 
-cd /home/pi/pi-ink-newsframe && git pull origin master -f --depth=1 && chown pi.pi -R *
+cd /home/pi/pi-ink-newsframe && git fetch -a && git reset --hard origin/master && chown pi.pi -R *
 
 # python3 /home/pi/pi-ink-newsframe/main.py & 
 # python3 /home/pi/pi-ink-newsframe/server.py & 
