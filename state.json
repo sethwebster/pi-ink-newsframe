@@ -1,0 +1,16 @@
+{
+  "papers": [
+    "NY_NYT",
+    "CARTOON",
+    "AZ_ADS",
+    "TX_HC",
+    "CA_SFC",
+    "CA_LAT",
+    "DC_WP",
+    "ITA_IGV",
+    "ITA_LS"
+  ],
+  "current_index": -1,
+  "next_render": 0,
+  "interval": 900
+}

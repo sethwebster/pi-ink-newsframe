@@ -8,5 +8,5 @@ last-paper.dat
 .vscode
 **/__pycache__/*
 wget-log
-state.json
+# state.json
 supervisor.log
