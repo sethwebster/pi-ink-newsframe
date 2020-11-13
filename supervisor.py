@@ -32,7 +32,7 @@ except:
     sys.exit()
 
 percData = pj.status.GetChargeLevel()
-message = "Battery Level is currently {}%".format(percData['data'])
+message = "Battery Level is currently {}%\n".format(percData['data'])
 print(message)
 with open('/home/pi/pi-ink-newsframe/supervisor.log','a') as f:
     f.write(message)
