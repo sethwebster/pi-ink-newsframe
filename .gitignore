@@ -9,3 +9,4 @@ last-paper.dat
 **/__pycache__/*
 wget-log
 state.json
+supervisor.log
