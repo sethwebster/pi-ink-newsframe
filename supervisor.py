@@ -42,7 +42,7 @@ with open('/home/pi/pi-ink-newsframe/supervisor.log','a') as f:
     f.write(message)
 
 if (int(percData['data']) < 75):
-  os.system('curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/ACc204746fc75f13ca53c6647f607bcd31/Messages" -u "ACc204746fc75f13ca53c6647f607bcd31:c1d98da60721e0a354014d79d37b2ec8"'.format(message))
+  os.system('curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/ACc204746fc75f13ca53c6647f607bcd31/Messages" -u "ACc204746fc75f13ca53c6647f607bcd31:8ad73404b41f366f5751b3d11a47e851"'.format(message))
 
 with open('/home/pi/pi-ink-newsframe/supervisor.log','a') as f:
     f.write(txt)
