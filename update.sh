@@ -1,7 +1,14 @@
 ID=$(ps aux | grep python | grep main.py | awk '{ print $2 }')
-sudo kill $ID
+if [ -z "$ID" ]
+then
+  sudo kill $ID
+fi
+
 ID=$(ps aux | grep python | grep server.py | awk '{ print $2 }')
-sudo kill $ID
+if [ -z "$ID" ]
+then
+  sudo kill $ID
+fi
 
 cd /home/pi/pi-ink-newsframe && git pull origin master -f --depth=1 && chown pi.pi -R *
 
