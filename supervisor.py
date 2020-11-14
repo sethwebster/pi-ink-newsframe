@@ -12,6 +12,8 @@ import sys
 import logging
 
 def log(str):
+    with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
+        f.write(str)
     logging.info("[NewsFrame]: " + str)
 
 logging.basicConfig(level=logging.INFO)
