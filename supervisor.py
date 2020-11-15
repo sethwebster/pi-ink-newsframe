@@ -18,19 +18,11 @@ def log(str):
         f.write(str)
     logging.info("[NewsFrame]: " + str)
 
-def send_sms(message):
-    logging.info("Sending sms: {}".format(message))
-    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-    account_key = os.getenv("TWILIO_ACCOUNT_KEY")
-    curl = 'curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/{}/Messages" -u "{}:{}"'.format(
-        message, account_sid, account_sid, account_key)
-    os.system(curl)
-
 def send_hook(message):
     url = "https://discord.com/api/webhooks/777668325265899530/U93vdjRSkir587zVVz9-jy1SsbtZhcV38msr1g7_4735ktbroJAI6nx675p6VpraQ7Pj"
     data = {}
     #for all params, see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
-    data["content"] = "message content"
+    data["content"] = message
     # data["username"] = "custom username"
     result = requests.post(url, data=json.dumps(data), headers={"Content-Type": "application/json"})
     try:
@@ -39,8 +31,6 @@ def send_hook(message):
         print(err)
     else:
         print("Payload delivered successfully, code {}.".format(result.status_code))
-
-send_hook("Hello!")
 
 logging.basicConfig(level=logging.INFO)
 logging.info("Newsframe Supervisor Started")
@@ -77,7 +67,7 @@ if 'data' in percData:
     logging.info(message)
     if (int(percData['data']) < MIN_CHARGE_NOTIFY):
         log("Battery level lower than {}% -- notifying via SMS that battery level is {}".format(MIN_CHARGE_NOTIFY, percData['data']))
-        send_sms(message)
+        send_hook(message)
 else:
     message = "Error: Could not get battery level."
     logging.info(message)
@@ -110,10 +100,10 @@ a['second'] = 0
 status = pj.rtcAlarm.SetAlarm(a)
 if status['error'] != 'NO_ERROR':
     log('Cannot set alarm\n')
-    send_sms("Unable to set alarm:{}".format(status['error']))
+    send_hook("Unable to set alarm:{}".format(status['error']))
     sys.exit()
 else:
-    send_sms('Alarm set for ' + str(pj.rtcAlarm.GetAlarm()))
+    send_hook('Alarm set for ' + str(pj.rtcAlarm.GetAlarm()))
     log('Alarm set for ' + str(pj.rtcAlarm.GetAlarm()))
 
 # Enable wakeup, otherwise power to the RPi will not be
