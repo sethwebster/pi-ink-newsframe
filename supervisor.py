@@ -45,10 +45,14 @@ except:
     sys.exit()
 log("PiJuice Object Initialized")
 
-
 percData = pj.status.GetChargeLevel()
-message = "Battery Level is currently {}%\n".format(percData['data'])
-logging.info(message)
+if 'data' in percData:
+    message = "Battery Level is currently {}%\n".format(percData['data'])
+    logging.info(message)
+else:
+    message = "Error: Could not get battery level."
+    logging.info(message)
+    print(percData)
 
 with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
     f.write(message)
