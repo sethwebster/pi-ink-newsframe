@@ -47,8 +47,17 @@ log("PiJuice Object Initialized")
 
 percData = pj.status.GetChargeLevel()
 if 'data' in percData:
+    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    account_key = os.getenv("TWILIO_ACCOUNT_KEY")
     message = "Battery Level is currently {}%\n".format(percData['data'])
     logging.info(message)
+    if (int(percData['data']) < MIN_CHARGE_NOTIFY):
+        log("Battery level lower than {}% -- notifying via SMS that battery level is {}".format(MIN_CHARGE_NOTIFY, percData['data']))
+
+        curl = 'curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/{}/Messages" -u "{}:{}"'.format(
+            message, account_sid, account_sid, account_key)
+        print(curl)
+        os.system(curl)
 else:
     message = "Error: Could not get battery level."
     logging.info(message)
@@ -57,15 +66,6 @@ else:
 with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
     f.write(message)
 
-account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-account_key = os.getenv("TWILIO_ACCOUNT_KEY")
-if (int(percData['data']) < MIN_CHARGE_NOTIFY):
-    log("Battery level lower than {}% -- notifying via SMS that battery level is {}".format(MIN_CHARGE_NOTIFY, percData['data']))
-
-    curl = 'curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/{}/Messages" -u "{}:{}"'.format(
-        message, account_sid, account_sid, account_key)
-    print(curl)
-    os.system(curl)
 
 with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
     f.write(txt)
