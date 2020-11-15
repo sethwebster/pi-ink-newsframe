@@ -16,6 +16,15 @@ def log(str):
         f.write(str)
     logging.info("[NewsFrame]: " + str)
 
+def send_sms(message):
+    logging.info("Sending sms: {}".format(message))
+    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    account_key = os.getenv("TWILIO_ACCOUNT_KEY")
+    curl = 'curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/{}/Messages" -u "{}:{}"'.format(
+        message, account_sid, account_sid, account_key)
+    os.system(curl)
+
+
 logging.basicConfig(level=logging.INFO)
 logging.info("Newsframe Supervisor Started")
 DELTA_MIN = 20
@@ -47,17 +56,11 @@ log("PiJuice Object Initialized")
 
 percData = pj.status.GetChargeLevel()
 if 'data' in percData:
-    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-    account_key = os.getenv("TWILIO_ACCOUNT_KEY")
     message = "Battery Level is currently {}%\n".format(percData['data'])
     logging.info(message)
     if (int(percData['data']) < MIN_CHARGE_NOTIFY):
         log("Battery level lower than {}% -- notifying via SMS that battery level is {}".format(MIN_CHARGE_NOTIFY, percData['data']))
-
-        curl = 'curl -X POST -d "Body={}" -d "From=+17134899226" -d "To=6463500739" "https://api.twilio.com/2010-04-01/Accounts/{}/Messages" -u "{}:{}"'.format(
-            message, account_sid, account_sid, account_key)
-        print(curl)
-        os.system(curl)
+        send_sms(message)
 else:
     message = "Error: Could not get battery level."
     logging.info(message)
@@ -90,8 +93,10 @@ a['second'] = 0
 status = pj.rtcAlarm.SetAlarm(a)
 if status['error'] != 'NO_ERROR':
     log('Cannot set alarm\n')
+    send_sms("Unable to set alarm:{}".format(status['error']))
     sys.exit()
 else:
+    send_sms('Alarm set for ' + str(pj.rtcAlarm.GetAlarm()))
     log('Alarm set for ' + str(pj.rtcAlarm.GetAlarm()))
 
 # Enable wakeup, otherwise power to the RPi will not be
