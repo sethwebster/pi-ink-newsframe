@@ -10,6 +10,8 @@ import datetime
 import os
 import sys
 import logging
+import requests #dependency
+import json
 
 def log(str):
     with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
@@ -24,6 +26,21 @@ def send_sms(message):
         message, account_sid, account_sid, account_key)
     os.system(curl)
 
+def send_hook(message):
+    url = "https://discord.com/api/webhooks/777668325265899530/U93vdjRSkir587zVVz9-jy1SsbtZhcV38msr1g7_4735ktbroJAI6nx675p6VpraQ7Pj"
+    data = {}
+    #for all params, see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
+    data["content"] = "message content"
+    # data["username"] = "custom username"
+    result = requests.post(url, data=json.dumps(data), headers={"Content-Type": "application/json"})
+    try:
+        result.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+    else:
+        print("Payload delivered successfully, code {}.".format(result.status_code))
+
+send_hook("Hello!")
 
 logging.basicConfig(level=logging.INFO)
 logging.info("Newsframe Supervisor Started")
