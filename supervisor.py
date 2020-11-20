@@ -34,7 +34,7 @@ def send_hook(message):
 
 logging.basicConfig(level=logging.INFO)
 logging.info("Newsframe Supervisor Started")
-DELTA_MIN = 20
+DELTA_MIN = 60
 MIN_CHARGE_NOTIFY=100
 # Rely on RTC to keep the time
 subprocess.call(["sudo", "hwclock", "--hctosys"])
