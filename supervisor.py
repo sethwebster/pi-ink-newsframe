@@ -18,7 +18,7 @@ def log(str):
     logstr = dt + " - " + str
     with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
         f.write(logstr + "\n")
-        
+
     logging.info("[NewsFrame]: " + str)
 
 def send_hook(message):
@@ -116,6 +116,6 @@ time.sleep(0.4)
 
 # PiJuice shuts down power to Rpi after 20 sec from now
 # This leaves sufficient time to execute the shutdown sequence
-log("Powering off...")
+log("Powering off in ~20 seconds")
 pj.power.SetPowerOff(20)
 subprocess.call(["sudo", "poweroff"])
