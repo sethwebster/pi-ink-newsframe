@@ -14,8 +14,11 @@ import requests #dependency
 import json
 
 def log(str):
+    dt = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    logstr = dt + " - " + str
     with open('/home/pi/pi-ink-newsframe/supervisor.log', 'a') as f:
-        f.write(str)
+        f.write(logstr + "\n")
+        
     logging.info("[NewsFrame]: " + str)
 
 def send_hook(message):
