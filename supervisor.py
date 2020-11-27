@@ -117,5 +117,7 @@ time.sleep(0.4)
 # PiJuice shuts down power to Rpi after 20 sec from now
 # This leaves sufficient time to execute the shutdown sequence
 log("Powering off in ~20 seconds")
-pj.power.SetPowerOff(20)
+res = pj.power.SetPowerOff(20)
+print(res)
+log(str(res))
 subprocess.call(["sudo", "poweroff"])
