@@ -40,7 +40,8 @@ logging.info("Newsframe Supervisor Started")
 DELTA_MIN = 45
 MIN_CHARGE_NOTIFY=100
 # Rely on RTC to keep the time
-subprocess.call(["sudo", "hwclock", "--hctosys"])
+os.system("sudo sh /home/pi/pi-ink-newsframe/hwclock.sh")
+# subprocess.call(["sudo", "hwclock", "--hctosys"])
 
 # Record start time
 txt = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' -- Started\n'
